@@ -15,8 +15,8 @@ func main() {
 func demoApp() {
 	//Set the AK/SK to sign and authenticate the request.
 	s := core.Signer{
-		Key:    "JHXGYXPZD9PJMZVTVDYG",
-		Secret: "32wR6ziaNK2CcxUPSegNtHPsiqfziyWjw4cZcRTl",
+		Key:    "",
+		Secret: "",
 	}
 	//The following example shows how to set the request URL and parameters to query a VPC list.
 
