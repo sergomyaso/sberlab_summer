@@ -11,7 +11,7 @@ data "sbercloud_images_image" "ubuntu_image" {
 }
 
 # Get the subnet where ECS will be created
-data "vpc-summer-school" "ss-subnet-0" {
+data "sbercloud_vpc_subnet" "subnet_01" {
   name = "ss-subnet-0"
 }
 

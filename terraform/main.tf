@@ -11,7 +11,7 @@ terraform {
 # Configure the SberCloud Provider
 provider "sbercloud" {
     region = "ru-moscow-1"
-    access_key = ""
-    secret_key = ""
-    project_name = "summer_school"
+    access_key = "Y8L5MUQELXP58RGGDCWF"
+    secret_key = "dSJ8CHeNjqSep7jScmiw7janbKtl7aCe24F2BLBv"
+    project_name = "ru-moscow-1"
 }
