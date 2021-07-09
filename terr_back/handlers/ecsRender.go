@@ -1,4 +1,4 @@
-package ScriptRunner
+package handlers
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"html/template"
 )
 
-var page = `{{template "ecsParams" .EcsParams}}`
+var ecsPage = `{{template "ecsParams" .EcsParams}}`
 
 var ecsTemplate = `{{define "ecsParams"}}
 # Declare all required input variables
@@ -33,7 +33,7 @@ resource "sbercloud_compute_instance" "ecs_01"{
   flavor_id         = "{{.FlavorId}}"
   security_groups   = ["{{.SecGroup}}"]
   availability_zone = "ru-moscow-1a"
-  admin_pass        = var.root_password
+  admin_pass        = "admin"
 
   system_disk_type = "SAS"
   system_disk_size = {{.DiskSize}}
@@ -44,25 +44,26 @@ resource "sbercloud_compute_instance" "ecs_01"{
 }
 {{end}}`
 
+
 type EcsParams struct {
-	Name       string
-	ImageId    string
-	FlavorId   string
-	SecGroup   string
-	DiskSize   int
-	SubnetName string
-	ImageTitle string
+	Name       string `json:"name" description:"uuid of the todo"`
+	ImageId    string `json:"imageId" description:"uuid of the todo"`
+	FlavorId   string `json:"flavorId" description:"uuid of the todo"`
+	SecGroup   string `json:"secGroup" description:"uuid of the todo"`
+	DiskSize   int `json:"diskSize" description:"uuid of the todo"`
+	SubnetName string `json:"subnetName" description:"uuid of the todo"`
+	ImageTitle string `json:"imageTitle" description:"uuid of the todo"`
 }
 
 type EcsPage struct {
 	EcsParams *EcsParams
 }
 
-func RenderEcs(page string, ecsTemplate string, params *EcsParams) string {
+func GetRenderEcsScript(params *EcsParams) string {
 	pageData := &EcsPage{EcsParams: params}
-	tmpl := template.New("page")
+	tmpl := template.New("ecsPage")
 	var err error
-	if tmpl, err = tmpl.Parse(page); err != nil {
+	if tmpl, err = tmpl.Parse(ecsPage); err != nil {
 		fmt.Println(err)
 	}
 	if tmpl, err = tmpl.Parse(ecsTemplate); err != nil {
@@ -73,10 +74,10 @@ func RenderEcs(page string, ecsTemplate string, params *EcsParams) string {
 	return buf.String()
 }
 
-func m() {
+/*func m() {
 	/*pagedata :=EcsParams: &EcsParams{Name: name, ImageId: imageId, FlavorId: flavorId,
 	SecGroup: secGroup, DiskSize: diskSize, SubnetName: subnetName, ImageTitle: imageTitle}*/
-	params := &EcsParams{Name: "name", ImageId: "imageId", FlavorId: "flavorId",
+	/*params := &EcsParams{Name: "name", ImageId: "imageId", FlavorId: "flavorId",
 		SecGroup: "secGroup", DiskSize: 12, SubnetName: "subnetName", ImageTitle: "imageTitle"}
-	println(RenderEcs(page, ecsTemplate, params))
-}
+	println(GetRenderEcsScript(configPage, ecsTemplate, params))
+}*/

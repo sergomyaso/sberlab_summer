@@ -1,7 +1,8 @@
-package ScriptRunner
+package handlers
 
 import (
 	"bytes"
+	"log"
 	"os/exec"
 )
 
@@ -14,6 +15,8 @@ func ExecCommand(command string) (string, error) {
 		return "", err
 	}
 	err = cmd.Wait()
+	log.Println("Your command:" + command)
+	log.Println(buf.String())
 	return buf.String(), nil
 }
 
