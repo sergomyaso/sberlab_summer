@@ -8,18 +8,18 @@ import (
 )
 
 const (
-	tempPath      = ""
+	tempPath         = "./"
 	configFilePrefix = "conf.*.tf"
-	ecsFilePrefix = "ecs.*.tf"
-	ecsDirPrefix  = "ecs"
+	ecsFilePrefix    = "ecs.*.tf"
+	ecsDirPrefix     = "ecs"
 )
 
 const (
-	trClientTitle     = "terraform.exe"
-	trClientPath      = "/utilities/" + trClientTitle
-	trValidateCommand = trClientPath + " validate"
-	trApplyCommand    = trClientPath + " apply"
-	trInitCommand     = trClientPath + " init"
+	trClientTitle     = "terraform"
+	trClientPath      = "./" + trClientTitle
+	trValidateCommand = " validate"
+	trApplyCommand    = "apply"
+	trInitCommand     = "init"
 )
 
 func creteTempDir(path string, prefix string) string {
@@ -30,22 +30,16 @@ func creteTempDir(path string, prefix string) string {
 	return dir
 }
 
-func createTempFile(path string, prefix string) string {
-	dir, err := ioutil.TempDir(path, prefix)
+func createTempFile(path string, prefix string) *os.File {
+	file, err := ioutil.TempFile(path, prefix)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return dir
+	return file
 }
 
-func insertDataInFile(path string, data string) {
-	f, err := os.OpenFile(path,
-		os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Println(err)
-	}
-	defer f.Close()
-	if _, err := f.WriteString(data); err != nil {
+func insertDataInFile(file *os.File, data string) {
+	if _, err := file.WriteString(data); err != nil {
 		log.Println(err)
 	}
 }
@@ -71,16 +65,19 @@ func copyFile(src, dst string) error {
 }
 
 func copyClient(copyPath string) {
-	copyFile(trClientPath, copyPath)
+	err := copyFile(trClientPath, copyPath)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func RunEcsScript(configScript, ecsScript string) {
 	tempDir := creteTempDir(tempPath, ecsDirPrefix)
-	ecsScriptPath := createTempFile(tempDir, ecsFilePrefix)
-	insertDataInFile(ecsScriptPath, ecsScript)
-	configScriptPath := createTempFile(tempDir, configFilePrefix)
-	insertDataInFile(ecsScriptPath, configScriptPath)
-	copyClient(tempPath + "/" + trClientTitle)
-	ExecCommand(trInitCommand)
-	ExecCommand(trApplyCommand)
+	ecsFileScript := createTempFile(tempDir, ecsFilePrefix)
+	insertDataInFile(ecsFileScript, ecsScript)
+	configFileScript := createTempFile(tempDir, configFilePrefix)
+	insertDataInFile(configFileScript, configScript)
+	//copyClient(tempDir + "\\" + trClientTitle)
+	ExecCommand(trClientPath, "-chdir="+tempDir, trInitCommand)
+	ExecCommand(trClientPath, "-chdir="+tempDir, trApplyCommand, "-auto-approve ")
 }

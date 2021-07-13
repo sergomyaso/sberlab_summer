@@ -33,7 +33,7 @@ resource "sbercloud_compute_instance" "ecs_01"{
   flavor_id         = "{{.FlavorId}}"
   security_groups   = ["{{.SecGroup}}"]
   availability_zone = "ru-moscow-1a"
-  admin_pass        = "admin"
+  admin_pass        = "adminAdmin123"
 
   system_disk_type = "SAS"
   system_disk_size = {{.DiskSize}}
