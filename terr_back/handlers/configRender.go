@@ -26,7 +26,6 @@ provider "sbercloud" {
     secret_key = "{{.SecretKey}}"
     project_name = "{{.ProjectName}}"
 }
-
 {{end}}`
 
 type ProviderConfig struct {

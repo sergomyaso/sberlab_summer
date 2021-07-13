@@ -7,7 +7,10 @@ import (
 	"net/http"
 )
 
-var configScriptProvider = ""
+type TerraformResponse struct {
+	Response string
+	Error    error
+}
 
 func createEcs(req *restful.Request, resp *restful.Response) {
 	ecsParams := new(handlers.EcsParams)
@@ -17,25 +20,13 @@ func createEcs(req *restful.Request, resp *restful.Response) {
 		return
 	}
 	ecsScript := handlers.GetRenderEcsScript(ecsParams)
-	if configScriptProvider != "" {
-		handlers.RunEcsScript(configScriptProvider, ecsScript)
-		resp.WriteEntity(ecsParams)
-		return
-	}
-	resp.WriteErrorString(404,"configure failed")
-}
-
-func createConfig(req *restful.Request, resp *restful.Response) {
-	configParams := new(handlers.ProviderConfig)
-	err := req.ReadEntity(configParams)
-	if err != nil { // bad request
-		resp.WriteErrorString(http.StatusBadRequest, err.Error())
-		return
-	}
-	configScriptProvider = handlers.GetRenderConfigScript(configParams)
-	log.Println("config script:" + configScriptProvider)
-
-	resp.WriteEntity(configParams)
+	log.Println(ecsScript)
+	var result string
+	result, err = handlers.RunEcsScript(ecsScript)
+	trResponse := new(TerraformResponse)
+	trResponse.Error = err
+	trResponse.Response = result
+	resp.WriteEntity(trResponse)
 }
 
 func RegisterTo(container *restful.Container) {
@@ -44,13 +35,9 @@ func RegisterTo(container *restful.Container) {
 	ws.Consumes(restful.MIME_JSON)
 	ws.Produces(restful.MIME_JSON)
 
-	ws.Route(ws.POST("/create/ecs").To(createEcs).
+	ws.Route(ws.POST("/ecs/create").To(createEcs).
 		Doc("Create ecs server").
 		Param(ws.BodyParameter("Data", "(JSON)").DataType("main.EcsParams")))
-
-	ws.Route(ws.POST("/config").To(createConfig).
-		Doc("Config provider").
-		Param(ws.BodyParameter("Data", "(JSON)").DataType("main.ConfigParams")))
 
 	container.Add(ws)
 }

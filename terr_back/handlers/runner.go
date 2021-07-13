@@ -17,7 +17,7 @@ const (
 const (
 	trClientTitle     = "terraform"
 	trClientPath      = "./" + trClientTitle
-	trValidateCommand = " validate"
+	trValidateCommand = "validate"
 	trApplyCommand    = "apply"
 	trInitCommand     = "init"
 )
@@ -71,13 +71,21 @@ func copyClient(copyPath string) {
 	}
 }
 
-func RunEcsScript(configScript, ecsScript string) {
+func RunEcsScript(ecsScript string) (string, error) {
 	tempDir := creteTempDir(tempPath, ecsDirPrefix)
 	ecsFileScript := createTempFile(tempDir, ecsFilePrefix)
 	insertDataInFile(ecsFileScript, ecsScript)
-	configFileScript := createTempFile(tempDir, configFilePrefix)
-	insertDataInFile(configFileScript, configScript)
-	//copyClient(tempDir + "\\" + trClientTitle)
-	ExecCommand(trClientPath, "-chdir="+tempDir, trInitCommand)
-	ExecCommand(trClientPath, "-chdir="+tempDir, trApplyCommand, "-auto-approve ")
+	result, err := ExecCommand(trClientPath, "-chdir="+tempDir, trInitCommand)
+	if err != nil {
+		//os.RemoveAll(tempPath + tempDir)
+		return "", err
+	}
+	result, err = ExecCommand(trClientPath, "-chdir="+tempDir, trApplyCommand, "-auto-approve")
+	log.Println(result)
+	if err != nil {
+	//	os.RemoveAll(tempPath + tempDir)
+		return "", err
+	}
+	//os.RemoveAll(tempPath + tempDir)
+	return result, nil
 }
