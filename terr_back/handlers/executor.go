@@ -17,5 +17,5 @@ func ExecCommand(command string, args ...string) (string, error) {
 	}
 	err = cmd.Wait()
 	log.Println(buf.String())
-	return buf.String(), nil
+	return buf.String(), err
 }

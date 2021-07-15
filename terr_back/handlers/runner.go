@@ -71,6 +71,33 @@ func copyClient(copyPath string) {
 	}
 }
 
+func RunUserScript(script string) (string, error) {
+	tempDir := creteTempDir(tempPath, ecsDirPrefix)
+	ecsFileScript := createTempFile(tempDir, ecsFilePrefix)
+	insertDataInFile(ecsFileScript, script)
+	result, err := ExecCommand(trClientPath, "-chdir="+tempDir, trInitCommand)
+	if err != nil {
+		//os.RemoveAll(tempPath + tempDir)
+		log.Printf("Exec error:%v\n", err)
+		return "", err
+	}
+	result, err = ExecCommand(trClientPath, trValidateCommand)
+	if err != nil {
+		//os.RemoveAll(tempPath + tempDir)
+		log.Printf("Exec error:%v\n", err)
+		return "", err
+	}
+	result, err = ExecCommand(trClientPath, "-chdir="+tempDir, trApplyCommand, "-auto-approve")
+	if err != nil {
+		//os.RemoveAll(tempPath + tempDir)
+		log.Printf("Exec error:%v\n", err)
+		return "", err
+	}
+	log.Println(result)
+	return result, nil
+}
+
+/*
 func RunEcsScript(ecsScript string) (string, error) {
 	tempDir := creteTempDir(tempPath, ecsDirPrefix)
 	ecsFileScript := createTempFile(tempDir, ecsFilePrefix)
@@ -89,3 +116,4 @@ func RunEcsScript(ecsScript string) (string, error) {
 	//os.RemoveAll(tempPath + tempDir)
 	return result, nil
 }
+*/
