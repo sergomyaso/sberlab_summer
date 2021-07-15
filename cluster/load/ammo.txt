@@ -1,0 +1,6 @@
+[Host: example.org]
+[Connection: close]
+[User-Agent: Tank]
+[Content-Type: application/json]
+44 /products/
+{"title": "someTitle","content":"someContent"}

@@ -1,0 +1,32 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: terraform
+  namespace: default
+  labels:
+    app: terraform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: terraform
+
+  template:
+    metadata:
+      name: terraform
+      labels:
+        app: terraform
+    spec:
+      containers:
+        - name: terraform
+          image: sergomyaso/terraform-serv:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            limits:
+              #memory: "512Mi"
+            requests:
+              #memory: "256Mi"
+

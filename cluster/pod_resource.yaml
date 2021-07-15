@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: terraform-dep
+  labels:
+    app: terraform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: terraform
+  template:
+    metadata:
+      labels:
+        app: terraform
+    spec:
+      containers:
+      - name: sergomyaso/terraform-server
+        image: sergomyaso/terraform-server:latest
+        ports:
+        - containerPort: 80
