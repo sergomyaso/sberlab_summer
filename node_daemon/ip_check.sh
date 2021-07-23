@@ -1,0 +1,1 @@
+ifconfig eth0 | grep 127.0.0.1 | cat >> ip_req_log.txt
