@@ -26,6 +26,17 @@ type DumpParams struct {
 	PodName string `json:"pod_name"`
 }
 
+func execScript(scriptName string) error {
+	log.Println("Run script " + scriptName)
+	cmd := exec.Command("./" + scriptName)
+	err := cmd.Start()
+	if err != nil {
+		return err
+	}
+	err = cmd.Wait()
+	return err
+}
+
 func CreateCheckIpScript(ip string) (string, error) {
 	file, err := os.Create(IpScriptName)
 	if err != nil {
@@ -62,31 +73,21 @@ func isCurrentNodeIp(ip string) bool {
 		//#TODO error!
 		return false
 	}
-	//exec.Command("./daemon/" + fileName)
-	cmd := exec.Command("./" + fileName)
-	var buf bytes.Buffer
-	cmd.Stdout = &buf
-	err = cmd.Start()
-	if err != nil {
-		log.Println(err)
-		return false
-	}
-	err = cmd.Wait()
-	log.Println(buf.String())
-
-	log.Println("run " + fileName)
+	execScript(fileName)
 	return isIpScriptLog()
 }
 
 func redirectOnNode(params *DumpParams) int {
 	var jsonStr = []byte(fmt.Sprintf(JsonRequestTemplate, params.Ip, params.PodName))
-	req, err := http.NewRequest("POST", "https://"+params.Ip+NodePort, bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequest("POST",  "http://"+ params.Ip+NodePort + "/dump/memory", bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", restful.MIME_JSON)
 	// #TODO add route to request
 	client := &http.Client{}
 	resp := new(http.Response)
 	resp, err = client.Do(req)
+
 	if err != nil {
+		log.Println(err)
 		return KettleHttpCode
 	}
 	return resp.StatusCode
@@ -99,7 +100,6 @@ func createMemoryDumpScript(params *DumpParams) {
 	}
 	stringTemplate, _ := ioutil.ReadAll(file)
 	file.Close()
-
 	script := fmt.Sprintf(string(stringTemplate), params.PodName)
 	file, err = os.Create(DumpMemScriptName)
 	if err != nil {
@@ -114,22 +114,11 @@ func createMemoryDumpScript(params *DumpParams) {
 func CreateMemoryDump(params *DumpParams) int {
 	if !isCurrentNodeIp(params.Ip) {
 		respCode := redirectOnNode(params)
+		log.Println("redirect to " + params.Ip)
 		return respCode
 	}
 	log.Println("ip is correct")
 	createMemoryDumpScript(params)
-	//exec.Command("./" + DumpMemScriptName)
-
-	cmd := exec.Command("./" + DumpMemScriptName)
-	var buf bytes.Buffer
-	cmd.Stdout = &buf
-	err := cmd.Start()
-	if err != nil {
-		log.Println(err)
-		return 500
-	}
-	err = cmd.Wait()
-	log.Println(buf.String())
-
+	execScript(DumpMemScriptName)
 	return OkHttpCode
 }
