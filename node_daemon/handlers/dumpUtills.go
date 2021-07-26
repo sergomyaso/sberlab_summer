@@ -16,6 +16,7 @@ const IpScriptName = "ip_check.sh"
 const IpLogName = "ip_req_log.txt"
 const IpScriptTemplate = "#!/bin/sh\nifconfig eth0 | grep %s | cat >> " + IpLogName
 const JsonRequestTemplate = "{\"node_ip\":\"%s\",\"pod_name\":\"%s\"}"
+const ClearPageCashScriptName = "clear_page_cash.sh"
 
 func ExecScript(scriptName string) error {
 	log.Println("Run script " + scriptName)
@@ -26,6 +27,10 @@ func ExecScript(scriptName string) error {
 		return err
 	}
 	err = cmd.Wait()
+	if err != nil {
+		log.Printf("exec script %s, error:%v\n", scriptName, err)
+		return err
+	}
 	return err
 }
 
@@ -57,7 +62,7 @@ func IsCurrentNodeIp(ip string) bool {
 }
 
 func RedirectOnNode(params *DumpParams, route string) int {
-	var jsonStr = []byte(fmt.Sprintf(JsonRequestTemplate, params.Ip, params.PodName))
+	var jsonStr = []byte(fmt.Sprintf(JsonRequestTemplate, params.Ip, params.PodUid))
 	req, err := http.NewRequest("POST", "http://"+params.Ip+NodePort+route, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", restful.MIME_JSON)
 	client := &http.Client{}
@@ -69,4 +74,11 @@ func RedirectOnNode(params *DumpParams, route string) int {
 		return KettleHttpCode
 	}
 	return resp.StatusCode
+}
+
+func ClearPageCash()  {
+	err := ExecScript(ClearPageCashScriptName)
+	if err != nil {
+		return
+	}
 }

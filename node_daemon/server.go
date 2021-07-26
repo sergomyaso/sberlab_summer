@@ -15,13 +15,14 @@ func handleHttpError(err error, resp *restful.Response, httpStatus int, stringEr
 	return err
 }
 
-func dumpMemory(req *restful.Request, resp *restful.Response) {
+func dump(req *restful.Request, resp *restful.Response) {
 	dumpParams := new(handlers.DumpParams)
 	err := req.ReadEntity(dumpParams)
 	if handleHttpError(err, resp, 418, "bad request") != nil {
+		log.Printf("bad request, error%v\n", err)
 		return
 	}
-	status := handlers.CreateMemoryDump(dumpParams)
+	status := handlers.CreateDump(dumpParams)
 	resp.WriteError(status, nil)
 }
 
@@ -31,11 +32,11 @@ func RegisterTo(container *restful.Container) {
 	ws.Consumes(restful.MIME_JSON)
 	ws.Produces(restful.MIME_JSON)
 
-	ws.Route(ws.POST("/memory").To(dumpMemory).
+	ws.Route(ws.POST("/memory").To(dump).
 		Doc("Create dump memory").
 		Param(ws.BodyParameter("Data", "(JSON)").DataType("text")))
 
-	ws.Route(ws.GET("/test/get").To(dumpMemory).
+	ws.Route(ws.POST("/cpu").To(dump).
 		Doc("Get test data").
 		Param(ws.BodyParameter("Data", "(JSON)").DataType("text")))
 
@@ -63,6 +64,6 @@ func main() {
 	wsContainer.Filter(wsContainer.OPTIONSFilter)
 	wsContainer.Filter(CORSFilter)
 
-	log.Print("start listening on localhost"+handlers.NodePort)
+	log.Print("start listening on localhost" + handlers.NodePort)
 	log.Fatal(http.ListenAndServe(handlers.NodePort, wsContainer))
 }
