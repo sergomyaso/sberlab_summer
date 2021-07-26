@@ -1,0 +1,27 @@
+type: memory
+
+deploy:
+  cluster-configuration: ./configs/myaso-config.yaml
+  template: ./template/deploy-template.yaml
+  name: java-http
+  image: sergomyaso/java-http
+  memory-limit: 20Mi
+  cpu-limit: 1
+  replicas: 1
+  namespace: default
+  container-port: 8080
+
+test:
+  server-url: http://178.170.195.224
+  daemon-url: http://178.170.195.224:8080
+  pod-prepare: 10
+  test-method: GET
+  load: 0.1
+  time-load: 10
+  values:
+    start: 20
+    end: 21
+    step: 1
+
+
+

@@ -1,12 +1,13 @@
-import requests
-
-from deploy_create import DeployEntity, ResourceHandler
-from test_pod import TestEntity, DeployTester
+from config_parser import ConfigTestRunner
+from test_pod import DeployTester
 from load_generator import LoadGenerator
 
+
+def main():
+    tester = DeployTester(LoadGenerator())
+    test_runner = ConfigTestRunner(tester)
+    test_runner.run_test_from_config("./test-config.yaml")
+
+
 if __name__ == '__main__':
-    generator = LoadGenerator()
-    dp = DeployEntity("template/DeployTemplate.yaml", "java-http", "sergomyaso/java-http", "50Mi", 1)
-    entity = TestEntity("configs/myaso-config.yaml", dp, "http://178.170.195.224")
-    tester = DeployTester(generator)
-    tester.run_deploy_mem_test(entity)
+    main()

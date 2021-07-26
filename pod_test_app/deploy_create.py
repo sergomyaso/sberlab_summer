@@ -24,6 +24,18 @@ class DeployEntity:
             return eval(f'f"""{string_template}"""')
 
 
+class PodEntity:
+    def __init__(self, node_ip, pod_uid):
+        self.node_ip = node_ip
+        self.pod_uid = pod_uid
+
+    def get_dict_view(self):
+        return {
+            "node_ip": self.node_ip,
+            "pod_uid": self.pod_uid
+        }
+
+
 class ResourceHandler:
     __TEMP_PATH = "./temp"
 
@@ -50,6 +62,7 @@ class ResourceHandler:
             try:
                 k8s_apps_v1.create_namespaced_deployment(
                     body=dep, namespace=resource_entity.namespace)
+
                 print(f"\n[INFO] deployment {resource_entity.name} created.")
             except ApiException:
                 print(f"\n[ERROR] deployment {resource_entity.name} NOT created.")
@@ -61,3 +74,11 @@ class ResourceHandler:
         k8s_apps_v1 = client.AppsV1Api()
         k8s_apps_v1.delete_namespaced_deployment(name=resource_entity.name, namespace=resource_entity.namespace)
         print(f"\n[INFO] deployment {resource_entity.name} deleted.")
+
+    def get_pod_information(self, namespace):
+        self.__config_client()
+        ret = client.CoreV1Api().list_namespaced_pod(namespace=namespace)
+        pod_list = list()
+        for item in ret.items:
+            pod_list.append(PodEntity(item.status.host_ip, item.metadata.uid.replace("-", "_")))
+        return pod_list
