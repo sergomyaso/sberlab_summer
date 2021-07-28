@@ -1,0 +1,10 @@
+{
+  "name": "http_server",
+  "version": "1.0.0",
+  "description": "Simple http server",
+  "author": "sergomyaso",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
