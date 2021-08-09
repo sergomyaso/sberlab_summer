@@ -3,31 +3,24 @@ package main
 import (
 	"github.com/emicklei/go-restful/v3"
 	"github.com/terrServ/handlers"
+	"github.com/terrServ/render"
 	"log"
 	"net/http"
 )
 
 type TerraformResponse struct {
-	Response string
-	Error    error
+	Response string `json:"response"`
+	Error    error `json:"error"`
 }
-
-type LoadEntity struct {
-	Title   string
-	Content string
-}
-
-var EntitiesCounter = 0
-var mapEntity = make(map[int]LoadEntity)
 
 func createEcs(req *restful.Request, resp *restful.Response) {
-	ecsParams := new(handlers.EcsParams)
+	ecsParams := new(render.EcsParams)
 	err := req.ReadEntity(ecsParams)
 	if err != nil { // bad request
 		resp.WriteErrorString(http.StatusBadRequest, err.Error())
 		return
 	}
-	ecsScript := handlers.GetRenderEcsScript(ecsParams)
+	ecsScript := render.GetRenderEcsScript(ecsParams)
 	log.Println(ecsScript)
 	var result string
 	result, err = handlers.RunUserScript(ecsScript)
@@ -52,25 +45,9 @@ func runUserScript(req *restful.Request, resp *restful.Response) {
 	resp.WriteEntity(trResponse)
 }
 
-func getEntities(req *restful.Request, resp *restful.Response) {
-	resp.WriteEntity(mapEntity)
-}
-
-func addEntity(req *restful.Request, resp *restful.Response) {
-	item := new(LoadEntity)
-	err := req.ReadEntity(item)
-	if err != nil {
-		resp.WriteErrorString(404, "put error")
-		return
-	}
-	mapEntity[EntitiesCounter] = *item
-	EntitiesCounter++
-	resp.WriteEntity(item)
-}
-
 func RegisterTo(container *restful.Container) {
 	ws := new(restful.WebService)
-	ws.Path("/sbercloud")
+	ws.Path("/terraform")
 	//ws.Consumes(restful.MIME_JSON)
 	ws.Produces(restful.MIME_JSON)
 
@@ -78,16 +55,8 @@ func RegisterTo(container *restful.Container) {
 		Doc("Create ecs server").
 		Param(ws.BodyParameter("Data", "(JSON)").DataType("main.EcsParams")))
 
-	ws.Route(ws.POST("/test/post").To(addEntity).
-		Doc("Set test data").
-		Param(ws.BodyParameter("Data", "(JSON)").DataType("text")))
-
-	ws.Route(ws.GET("/test/get").To(getEntities).
-		Doc("Get test data").
-		Param(ws.BodyParameter("Data", "(JSON)").DataType("text")))
-
 	ws.Route(ws.POST("/run/script").To(runUserScript).
-		Doc("Run script").
+		Doc("Run user script").
 		Param(ws.BodyParameter("Data", "(JSON)").DataType("text")))
 
 	container.Add(ws)

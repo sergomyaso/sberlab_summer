@@ -1,4 +1,4 @@
-package handlers
+package render
 
 import (
 	"bytes"
@@ -42,7 +42,7 @@ type ConfigPage struct {
 }
 
 func GetRenderConfigScript( configs *ProviderConfig) string {
-	pageData := &ConfigPage{ProviderConfig:configs}
+	pageData := &ConfigPage{ProviderConfig: configs}
 	tmpl := template.New("configPage")
 	var err error
 	if tmpl, err = tmpl.Parse(configPage); err != nil {
