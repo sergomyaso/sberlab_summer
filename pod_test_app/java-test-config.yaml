@@ -5,23 +5,21 @@ deploy:
   template: ./template/deploy-template.yaml
   name: java-http
   image: sergomyaso/java-http
-  memory-limit: 20Mi
-  cpu-limit: 1
+  memory-limit: 400Mi
+  cpu-limit: 2
   replicas: 1
   namespace: default
   container-port: 8080
 
 test:
+  name: java_test_f
   server-url: http://178.170.195.224
-  daemon-url: http://178.170.195.224:8080
-  pod-prepare: 10
+  daemon-url: http://178.170.195.224:6969
+  pod-prepare: 15
   test-method: GET
   load: 0.1
-  time-load: 10
+  time-load: 20
   values:
-    start: 20
-    end: 21
+    start: 100
+    end: 121
     step: 1
-
-
-

@@ -29,13 +29,14 @@ class ConfigTestRunner:
             config["deploy"]["container-port"]
         )
         return TestEntity(
+            config["test"]["name"],
             config["type"],
             config["deploy"]["cluster-configuration"],
             deploy_entity,
             config["test"]["server-url"],
             config["test"]["daemon-url"],
             (config["test"]["values"]["start"], config["test"]["values"]["end"], config["test"]["values"]["step"]),
-            config["test"]["time-load"],
+            config["test"]["pod-prepare"],
             config["test"]["test-method"],
             config["test"]["load"],
             config["test"]["time-load"]

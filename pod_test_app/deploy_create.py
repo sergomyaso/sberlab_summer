@@ -29,8 +29,10 @@ class PodEntity:
         self.node_ip = node_ip
         self.pod_uid = pod_uid
 
-    def get_dict_view(self):
+    def get_dict_view(self, test_name, test_type):
         return {
+            "test_name": test_name,
+            "test_type": test_type,
             "node_ip": self.node_ip,
             "pod_uid": self.pod_uid
         }

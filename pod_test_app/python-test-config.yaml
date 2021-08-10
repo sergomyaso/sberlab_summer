@@ -1,0 +1,25 @@
+type: cpu
+
+deploy:
+  cluster-configuration: ./configs/myaso-config.yaml
+  template: ./template/deploy-template.yaml
+  name: python-http
+  image: sergomyaso/python-http
+  memory-limit: 400Mi
+  cpu-limit: 1
+  replicas: 1
+  namespace: default
+  container-port: 8080
+
+test:
+  name: python_cpu
+  server-url: http://178.170.195.224:57071
+  daemon-url: http://178.170.195.224:6969
+  pod-prepare: 15
+  test-method: GET
+  load: 0.1
+  time-load: 20
+  values:
+    start: 0.1
+    end: 2.1
+    step: 0.1
