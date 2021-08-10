@@ -1,15 +1,15 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <img class="logo" alt="Terraform logo" src="./assets/tr.jpg">
+  <UploadModule/>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import UploadModule from './components/UploadModule.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    UploadModule
   }
 }
 </script>
@@ -22,5 +22,9 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+.logo {
+  width: 60%;
+  height: 60%;
 }
 </style>
