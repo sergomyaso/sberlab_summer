@@ -26,11 +26,25 @@ func dump(req *restful.Request, resp *restful.Response) {
 	resp.WriteError(status, nil)
 }
 
+func clearPageCash(req *restful.Request, resp *restful.Response) {
+	//node1Param := handlers.DumpParams{TestName: "clspg", Ip: "192.168.0.71", PodUid: "none"}
+	//node2Param := handlers.DumpParams{TestName: "clspg", Ip: "192.168.0.20", PodUid: "none"}
+	//route := "/dump/clspg"
+	//handlers.RedirectOnNode(&node1Param, route)
+	//handlers.RedirectOnNode(&node2Param, route)
+	resp.WriteError(200, nil)
+	handlers.ClearPageCash()
+}
+
 func RegisterTo(container *restful.Container) {
 	ws := new(restful.WebService)
 	ws.Path("/dump")
 	ws.Consumes(restful.MIME_JSON)
 	ws.Produces(restful.MIME_JSON)
+
+	ws.Route(ws.POST("/clspg").To(clearPageCash).
+		Doc("clear page cash on nodes").
+		Param(ws.BodyParameter("Data", "(JSON)").DataType("text")))
 
 	ws.Route(ws.POST("/memory").To(dump).
 		Doc("Create dump memory").
@@ -66,4 +80,5 @@ func main() {
 
 	log.Print("start listening on localhost" + handlers.NodePort)
 	log.Fatal(http.ListenAndServe(handlers.NodePort, wsContainer))
+
 }

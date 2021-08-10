@@ -12,12 +12,13 @@ const KettleHttpCode = 418
 const OkHttpCode = 200
 const TemplateScriptMemDump = "template_mem_script.sh"
 const DumpMemScriptName = "dump_mem.sh"
-const MemoryDumpRoute = "dump/memory"
-const CpuDumpRoute = "dump/cpu"
+const MemoryDumpRoute = "/dump/memory"
+const CpuDumpRoute = "/dump/cpu"
 const TemplateScriptCpuDump = "template_cpu_script.sh"
 const DumpCpuScriptName = "dump_cpu.sh"
 
 type DumpParams struct {
+	TestName string `json:"test_name"`
 	TestType string `json:"test_type"`
 	Ip       string `json:"node_ip"`
 	PodUid  string `json:"pod_uid"`
@@ -65,13 +66,13 @@ func createDumpScript(params *DumpParams, templateScript string, scriptName stri
 
 func RunDumpScript(params *DumpParams, templateScript string, dumpRoute string, scriptName string) int {
 	log.Println("checking ip address for " + params.PodUid)
-	if !IsCurrentNodeIp(params.Ip) {
-		log.Println("redirect to " + params.Ip)
-		respCode := RedirectOnNode(params, dumpRoute)
-		log.Printf("riderect with http code:%d\n", respCode)
-		ClearPageCash()
-		return respCode
-	}
+	//if !IsCurrentNodeIp(params.Ip) {
+	//	log.Println("redirect to " + params.Ip)
+	//	respCode := RedirectOnNode(params, dumpRoute)
+	//	log.Printf("riderect with http code:%d\n", respCode)
+	//	ClearPageCash()
+	//	return respCode
+	//}
 	log.Println(params.Ip + " is ip address current node")
 	createDumpScript(params, templateScript, scriptName)
 	err := ExecScript(scriptName)
@@ -80,7 +81,8 @@ func RunDumpScript(params *DumpParams, templateScript string, dumpRoute string, 
 		return KettleHttpCode
 	}
 	log.Printf("%s dump for %s was succeed\n", params.TestType, params.PodUid)
-	ClearPageCash()
+	SaveDumpedData(params)
+	//ClearPageCash()
 	return OkHttpCode
 }
 
